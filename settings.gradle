@@ -1,0 +1,2 @@
+rootProject.name = 'android-movie-mvvm'
+include ':app'
