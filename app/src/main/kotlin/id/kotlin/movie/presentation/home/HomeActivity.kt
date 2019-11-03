@@ -7,6 +7,7 @@ import dagger.android.support.DaggerAppCompatActivity
 import id.kotlin.movie.R
 import id.kotlin.movie.data.Result
 import id.kotlin.movie.databinding.ActivityHomeBinding
+import id.kotlin.movie.presentation.home.adapter.HomeAdapter
 import javax.inject.Inject
 
 class HomeActivity : DaggerAppCompatActivity(), HomeViewModelCallback {
@@ -14,9 +15,11 @@ class HomeActivity : DaggerAppCompatActivity(), HomeViewModelCallback {
   @Inject
   lateinit var viewModel: HomeViewModel
 
+  private lateinit var binding: ActivityHomeBinding
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    DataBindingUtil.setContentView<ActivityHomeBinding>(
+    binding = DataBindingUtil.setContentView<ActivityHomeBinding>(
         this,
         R.layout.activity_home
     ).apply {
@@ -31,7 +34,7 @@ class HomeActivity : DaggerAppCompatActivity(), HomeViewModelCallback {
   }
 
   override fun onResponse(results: List<Result>) {
-    Log.d(HomeActivity::class.java.simpleName, "${results.count()}")
+    binding.rvHome.adapter = HomeAdapter(results)
   }
 
   override fun onFailure(error: Throwable) {
