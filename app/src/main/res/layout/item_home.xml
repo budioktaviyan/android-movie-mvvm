@@ -7,7 +7,7 @@
 
     <variable
         name="viewModel"
-        type="id.kotlin.movie.presentation.home.adapter.HomeViewModel" />
+        type="id.kotlin.movie.presentation.home.adapter.HomeItemViewModel" />
   </data>
 
   <com.google.android.material.card.MaterialCardView
@@ -31,6 +31,7 @@
           android:adjustViewBounds="true"
           android:scaleType="center"
           app:layout_constraintTop_toTopOf="parent"
+          app:poster="@{viewModel.poster}"
           tools:background="@color/black"
           tools:ignore="ContentDescription" />
 
