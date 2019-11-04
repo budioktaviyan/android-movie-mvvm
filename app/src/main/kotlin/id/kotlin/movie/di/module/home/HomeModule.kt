@@ -3,7 +3,7 @@ package id.kotlin.movie.di.module.home
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import id.kotlin.movie.data.HomeDatasource
+import id.kotlin.movie.data.home.HomeDatasource
 import id.kotlin.movie.presentation.home.HomeActivity
 import id.kotlin.movie.presentation.home.HomeViewModel
 import id.kotlin.movie.presentation.home.HomeViewModelCallback

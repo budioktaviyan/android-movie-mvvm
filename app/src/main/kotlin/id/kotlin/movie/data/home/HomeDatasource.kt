@@ -1,4 +1,4 @@
-package id.kotlin.movie.data
+package id.kotlin.movie.data.home
 
 import id.kotlin.movie.BuildConfig
 import io.reactivex.Single

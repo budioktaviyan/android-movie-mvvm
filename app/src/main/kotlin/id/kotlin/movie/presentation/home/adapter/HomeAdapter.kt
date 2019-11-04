@@ -1,18 +1,22 @@
 package id.kotlin.movie.presentation.home.adapter
 
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import id.kotlin.movie.R
-import id.kotlin.movie.data.Result
+import id.kotlin.movie.data.home.Result
 import id.kotlin.movie.databinding.ItemHomeBinding
 import id.kotlin.movie.databinding.ItemLoadingBinding
 import id.kotlin.movie.presentation.home.adapter.HomeAdapterType.LOADING
 import id.kotlin.movie.presentation.home.adapter.HomeAdapterType.RESULT
 
-class HomeAdapter(private val results: MutableList<Result?>) : Adapter<ViewHolder>() {
+class HomeAdapter(
+    private val results: MutableList<Result?>,
+    private val callback: HomeAdapterCallback
+) : Adapter<ViewHolder>() {
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
       when (viewType) {
@@ -42,7 +46,7 @@ class HomeAdapter(private val results: MutableList<Result?>) : Adapter<ViewHolde
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     when (holder) {
       is HomeViewHolder -> holder.binding.apply {
-        viewModel = HomeAdapterViewModel(results[holder.adapterPosition])
+        viewModel = HomeAdapterViewModel(results[holder.adapterPosition], callback)
         executePendingBindings()
       }
       is LoadingViewHolder -> holder.binding.apply { executePendingBindings() }
@@ -59,19 +63,24 @@ class HomeAdapter(private val results: MutableList<Result?>) : Adapter<ViewHolde
 
   fun showLoading() {
     results.add(null)
-    notifyItemInserted(results.count().minus(1))
+    Handler().post { notifyItemInserted(results.count().minus(1)) }
   }
 
   fun hideLoading() {
     results.removeAt(results.count().minus(1))
-    notifyItemRemoved(results.count())
+    Handler().post { notifyItemRemoved(results.count()) }
   }
 
   fun loadMore(results: MutableList<Result?>) {
     this.results.addAll(results)
-    notifyDataSetChanged()
+    Handler().post { notifyDataSetChanged() }
   }
 
   inner class HomeViewHolder(val binding: ItemHomeBinding) : ViewHolder(binding.root)
   inner class LoadingViewHolder(val binding: ItemLoadingBinding) : ViewHolder(binding.root)
+
+  interface HomeAdapterCallback {
+
+    fun onClick(result: Result)
+  }
 }

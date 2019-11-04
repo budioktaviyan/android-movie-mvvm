@@ -1,6 +1,6 @@
 package id.kotlin.movie.presentation.home
 
-import id.kotlin.movie.data.HomeResponse
+import id.kotlin.movie.data.home.HomeResponse
 
 interface HomeViewModelCallback {
 

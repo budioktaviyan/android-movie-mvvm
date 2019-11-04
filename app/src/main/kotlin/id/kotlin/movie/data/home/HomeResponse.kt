@@ -1,4 +1,4 @@
-package id.kotlin.movie.data
+package id.kotlin.movie.data.home
 
 import com.google.gson.annotations.SerializedName
 

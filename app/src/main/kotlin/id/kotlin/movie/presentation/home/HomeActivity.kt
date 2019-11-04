@@ -1,5 +1,6 @@
 package id.kotlin.movie.presentation.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.databinding.DataBindingUtil
@@ -9,14 +10,18 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import dagger.android.support.DaggerAppCompatActivity
 import id.kotlin.movie.R
-import id.kotlin.movie.data.HomeResponse
+import id.kotlin.movie.data.detail.DetailModel
+import id.kotlin.movie.data.home.HomeResponse
+import id.kotlin.movie.data.home.Result
 import id.kotlin.movie.databinding.ActivityHomeBinding
+import id.kotlin.movie.presentation.detail.DetailActivity
 import id.kotlin.movie.presentation.home.adapter.HomeAdapter
+import id.kotlin.movie.presentation.home.adapter.HomeAdapter.HomeAdapterCallback
 import id.kotlin.movie.presentation.home.adapter.HomeAdapterType.LOADING
 import id.kotlin.movie.presentation.home.adapter.HomeAdapterType.RESULT
 import javax.inject.Inject
 
-class HomeActivity : DaggerAppCompatActivity(), HomeViewModelCallback {
+class HomeActivity : DaggerAppCompatActivity(), HomeViewModelCallback, HomeAdapterCallback {
 
   @Inject
   lateinit var viewModel: HomeViewModel
@@ -43,22 +48,21 @@ class HomeActivity : DaggerAppCompatActivity(), HomeViewModelCallback {
   }
 
   override fun onResponse(response: HomeResponse) {
-    adapter = HomeAdapter(response.results.filterNotNull().toMutableList())
+    adapter = HomeAdapter(response.results.filterNotNull().toMutableList(), this)
     binding.rvHome.adapter = adapter
+    binding.rvHome.setHasFixedSize(true)
 
     currentPage = response.page
     binding.rvHome.addOnScrollListener(object : OnScrollListener() {
       override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
         super.onScrolled(recyclerView, dx, dy)
+        if (currentPage >= response.totalPages || isLoading) return
 
         val layoutManager = recyclerView.layoutManager as GridLayoutManager
-        val lastVisibleItemPosition = layoutManager.findLastCompletelyVisibleItemPosition()
+        val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
         val totalItemCount = layoutManager.itemCount
 
-        if (currentPage < response.totalPages &&
-            !isLoading &&
-            dy > 0 &&
-            totalItemCount <= lastVisibleItemPosition.plus(2)) {
+        if ((lastVisibleItemPosition.plus(2)) > totalItemCount) {
           showLoading()
           currentPage++
           viewModel.loadMore(currentPage)
@@ -88,6 +92,24 @@ class HomeActivity : DaggerAppCompatActivity(), HomeViewModelCallback {
     currentPage = response.page
     hideLoading()
     adapter.loadMore(response.results.filterNotNull().toMutableList())
+  }
+
+  override fun onClick(result: Result) {
+    startActivity(
+        Intent(
+            this,
+            DetailActivity::class.java
+        ).apply {
+          putExtra(
+              DetailActivity::class.java.simpleName,
+              DetailModel(
+                  title = result.title,
+                  overview = result.overview,
+                  backdropPath = result.backdropPath
+              )
+          )
+        }
+    )
   }
 
   private fun showLoading() {

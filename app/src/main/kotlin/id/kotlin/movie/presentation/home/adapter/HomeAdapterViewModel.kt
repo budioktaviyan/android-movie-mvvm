@@ -6,9 +6,13 @@ import androidx.databinding.Bindable
 import androidx.databinding.BindingAdapter
 import coil.api.load
 import id.kotlin.movie.BuildConfig
-import id.kotlin.movie.data.Result
+import id.kotlin.movie.data.home.Result
+import id.kotlin.movie.presentation.home.adapter.HomeAdapter.HomeAdapterCallback
 
-class HomeAdapterViewModel(result: Result?) : BaseObservable() {
+class HomeAdapterViewModel(
+    private val result: Result?,
+    private val callback: HomeAdapterCallback
+) : BaseObservable() {
 
   val title: String = result?.title ?: "Untitled"
     @Bindable get
@@ -18,6 +22,10 @@ class HomeAdapterViewModel(result: Result?) : BaseObservable() {
 
   val poster: String = "${BuildConfig.IMAGE_URL}/${result?.posterPath ?: "untitled.jpg"}"
     @Bindable get
+
+  fun onClick() {
+    result?.let { callback.onClick(it) }
+  }
 }
 
 @BindingAdapter("poster")
