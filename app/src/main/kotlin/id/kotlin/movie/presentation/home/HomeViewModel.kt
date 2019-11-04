@@ -26,7 +26,7 @@ class HomeViewModel(
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe({ response ->
           hideLoading()
-          callback.onResponse(response.results.filterNotNull())
+          callback.onResponse(response)
         }, { error ->
           hideLoading()
           callback.onFailure(error)
@@ -35,6 +35,16 @@ class HomeViewModel(
 
   override fun onDetach() {
     disposables.clear()
+  }
+
+  override fun loadMore(page: Long) {
+    datasource.discoverMovie(page = page)
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe({ response ->
+          callback.onPagination(response)
+        }, { error ->
+          callback.onFailure(error)
+        }).addTo(disposables)
   }
 
   private fun showLoading() {

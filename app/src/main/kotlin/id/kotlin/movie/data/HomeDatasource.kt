@@ -10,6 +10,9 @@ interface HomeDatasource {
   @GET("/3/discover/movie")
   fun discoverMovie(
       @Query("api_key")
-      apiKey: String = BuildConfig.API_KEY
+      apiKey: String = BuildConfig.API_KEY,
+
+      @Query("page")
+      page: Long = 1L
   ): Single<HomeResponse>
 }

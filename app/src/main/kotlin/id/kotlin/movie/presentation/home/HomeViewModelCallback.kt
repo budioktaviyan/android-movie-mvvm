@@ -1,9 +1,10 @@
 package id.kotlin.movie.presentation.home
 
-import id.kotlin.movie.data.Result
+import id.kotlin.movie.data.HomeResponse
 
 interface HomeViewModelCallback {
 
-  fun onResponse(results: List<Result>)
+  fun onResponse(response: HomeResponse)
   fun onFailure(error: Throwable)
+  fun onPagination(response: HomeResponse)
 }

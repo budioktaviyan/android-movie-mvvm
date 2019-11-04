@@ -7,7 +7,7 @@
 
     <variable
         name="viewModel"
-        type="id.kotlin.movie.presentation.home.adapter.HomeItemViewModel" />
+        type="id.kotlin.movie.presentation.home.adapter.HomeAdapterViewModel" />
   </data>
 
   <com.google.android.material.card.MaterialCardView

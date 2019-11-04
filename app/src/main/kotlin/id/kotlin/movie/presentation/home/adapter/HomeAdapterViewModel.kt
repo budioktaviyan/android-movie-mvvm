@@ -8,15 +8,15 @@ import coil.api.load
 import id.kotlin.movie.BuildConfig
 import id.kotlin.movie.data.Result
 
-class HomeItemViewModel(result: Result) : BaseObservable() {
+class HomeAdapterViewModel(result: Result?) : BaseObservable() {
 
-  val title: String = result.title ?: "N/A"
+  val title: String = result?.title ?: "Untitled"
     @Bindable get
 
-  val rate: Double = result.voteAverage ?: 0.0
+  val rate: Double = result?.voteAverage ?: 0.0
     @Bindable get
 
-  val poster: String = "${BuildConfig.IMAGE_URL}/${result.posterPath}"
+  val poster: String = "${BuildConfig.IMAGE_URL}/${result?.posterPath ?: "untitled.jpg"}"
     @Bindable get
 }
 
