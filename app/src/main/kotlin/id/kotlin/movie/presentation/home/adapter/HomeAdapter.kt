@@ -14,7 +14,7 @@ import id.kotlin.movie.presentation.home.adapter.HomeAdapterType.LOADING
 import id.kotlin.movie.presentation.home.adapter.HomeAdapterType.RESULT
 
 class HomeAdapter(
-    private val results: MutableList<Result?>,
+    private var results: MutableList<Result?>,
     private val callback: HomeAdapterCallback
 ) : Adapter<ViewHolder>() {
 
@@ -73,6 +73,12 @@ class HomeAdapter(
 
   fun loadMore(results: MutableList<Result?>) {
     this.results.addAll(results)
+    Handler().post { notifyDataSetChanged() }
+  }
+
+  fun reload(results: MutableList<Result?>) {
+    this.results.clear()
+    this.results = results
     Handler().post { notifyDataSetChanged() }
   }
 

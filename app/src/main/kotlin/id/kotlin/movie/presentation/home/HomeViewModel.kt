@@ -41,9 +41,19 @@ class HomeViewModel(
     datasource.discoverMovie(page = page)
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe({ response ->
-          callback.onPagination(response)
+          callback.onPaginationSuccess(response)
         }, { error ->
-          callback.onFailure(error)
+          callback.onPaginationError(error)
+        }).addTo(disposables)
+  }
+
+  override fun reload() {
+    datasource.discoverMovie()
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe({ response ->
+          callback.onReloadSuccess(response)
+        }, { error ->
+          callback.onReloadError(error)
         }).addTo(disposables)
   }
 

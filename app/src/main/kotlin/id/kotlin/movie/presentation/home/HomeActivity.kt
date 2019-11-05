@@ -3,6 +3,7 @@ package id.kotlin.movie.presentation.home
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
@@ -27,8 +28,8 @@ class HomeActivity : DaggerAppCompatActivity(), HomeViewModelCallback, HomeAdapt
   lateinit var viewModel: HomeViewModel
 
   private lateinit var binding: ActivityHomeBinding
-  private lateinit var adapter: HomeAdapter
 
+  private var adapter: HomeAdapter? = null
   private var isLoading: Boolean = false
   private var currentPage: Long = -1L
 
@@ -40,6 +41,15 @@ class HomeActivity : DaggerAppCompatActivity(), HomeViewModelCallback, HomeAdapt
         R.layout.activity_home)
         .apply { viewModel = this@HomeActivity.viewModel }
         .also { viewModel.discoverMovie() }
+
+    binding.srlHome.setColorSchemeColors(
+        ContextCompat.getColor(
+            this,
+            R.color.black
+        )
+    )
+
+    binding.srlHome.setOnRefreshListener { viewModel.reload() }
   }
 
   override fun onDestroy() {
@@ -73,7 +83,7 @@ class HomeActivity : DaggerAppCompatActivity(), HomeViewModelCallback, HomeAdapt
     (binding.rvHome.layoutManager as GridLayoutManager).apply {
       spanSizeLookup = object : SpanSizeLookup() {
         override fun getSpanSize(position: Int): Int =
-            when (adapter.getItemViewType(position)) {
+            when (adapter?.getItemViewType(position)) {
               RESULT.ordinal -> 1
               LOADING.ordinal -> 2
               else -> throw RuntimeException("Illegal view type")
@@ -84,14 +94,29 @@ class HomeActivity : DaggerAppCompatActivity(), HomeViewModelCallback, HomeAdapt
 
   override fun onFailure(error: Throwable) {
     Log.e(HomeActivity::class.java.simpleName, "${error.printStackTrace()}")
+  }
+
+  override fun onPaginationSuccess(response: HomeResponse) {
+    currentPage = response.page
+    hideLoading()
+    adapter?.loadMore(response.results.filterNotNull().toMutableList())
+  }
+
+  override fun onPaginationError(error: Throwable) {
+    Log.e(HomeActivity::class.java.simpleName, "${error.printStackTrace()}")
     currentPage--
     hideLoading()
   }
 
-  override fun onPagination(response: HomeResponse) {
+  override fun onReloadSuccess(response: HomeResponse) {
     currentPage = response.page
-    hideLoading()
-    adapter.loadMore(response.results.filterNotNull().toMutableList())
+    binding.srlHome.isRefreshing = false
+    adapter?.reload(response.results.filterNotNull().toMutableList())
+  }
+
+  override fun onReloadError(error: Throwable) {
+    Log.e(HomeActivity::class.java.simpleName, "${error.printStackTrace()}")
+    binding.srlHome.isRefreshing = false
   }
 
   override fun onClick(result: Result) {
@@ -113,12 +138,12 @@ class HomeActivity : DaggerAppCompatActivity(), HomeViewModelCallback, HomeAdapt
   }
 
   private fun showLoading() {
-    adapter.showLoading()
+    adapter?.showLoading()
     isLoading = true
   }
 
   private fun hideLoading() {
-    adapter.hideLoading()
+    adapter?.hideLoading()
     isLoading = false
   }
 }
