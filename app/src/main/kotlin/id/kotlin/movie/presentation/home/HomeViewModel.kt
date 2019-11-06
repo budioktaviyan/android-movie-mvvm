@@ -1,69 +1,52 @@
 package id.kotlin.movie.presentation.home
 
-import android.view.View
-import androidx.databinding.BaseObservable
-import androidx.databinding.Bindable
-import androidx.databinding.library.baseAdapters.BR
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import id.kotlin.movie.data.home.HomeDatasource
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
+import javax.inject.Inject
 
-class HomeViewModel(
-    private val callback: HomeViewModelCallback,
+class HomeViewModel @Inject constructor(
     private val datasource: HomeDatasource
-) : BaseObservable(), HomeView {
-
-  var progressBarVisibility: Int = View.GONE
-    @Bindable get
+) : ViewModel(), HomeView {
 
   private val disposables: CompositeDisposable = CompositeDisposable()
+  private val observer = MutableLiveData<HomeViewState>()
 
-  override fun discoverMovie() {
-    showLoading()
+  override val states: LiveData<HomeViewState>
+    get() = observer
 
-    datasource.discoverMovie()
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe({ response ->
-          hideLoading()
-          callback.onResponse(response)
-        }, { error ->
-          hideLoading()
-          callback.onFailure(error)
-        }).addTo(disposables)
+  override fun onCleared() {
+    disposables.clear()
+    super.onCleared()
   }
 
-  override fun onDetach() {
-    disposables.clear()
+  override fun discoverMovie() {
+    datasource.discoverMovie()
+        .map<HomeViewState>(HomeViewState::Success)
+        .onErrorReturn(HomeViewState::Error)
+        .toFlowable()
+        .startWith(HomeViewState.Loading)
+        .subscribe(observer::postValue)
+        .let(disposables::add)
   }
 
   override fun loadMore(page: Long) {
     datasource.discoverMovie(page = page)
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe({ response ->
-          callback.onPaginationSuccess(response)
-        }, { error ->
-          callback.onPaginationError(error)
-        }).addTo(disposables)
+        .map<HomeViewState>(HomeViewState::PaginationSuccess)
+        .onErrorReturn(HomeViewState::PaginationError)
+        .toFlowable()
+        .subscribe(observer::postValue)
+        .let(disposables::add)
   }
 
   override fun reload() {
     datasource.discoverMovie()
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe({ response ->
-          callback.onReloadSuccess(response)
-        }, { error ->
-          callback.onReloadError(error)
-        }).addTo(disposables)
-  }
-
-  private fun showLoading() {
-    progressBarVisibility = View.VISIBLE
-    notifyPropertyChanged(BR.progressBarVisibility)
-  }
-
-  private fun hideLoading() {
-    progressBarVisibility = View.GONE
-    notifyPropertyChanged(BR.progressBarVisibility)
+        .map<HomeViewState>(HomeViewState::ReloadSuccess)
+        .onErrorReturn(HomeViewState::ReloadError)
+        .toFlowable()
+        .subscribe(observer::postValue)
+        .let(disposables::add)
   }
 }

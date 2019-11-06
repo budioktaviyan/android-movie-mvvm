@@ -2,16 +2,17 @@ package id.kotlin.movie.presentation.home.adapter
 
 import android.os.Handler
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import coil.api.load
+import id.kotlin.movie.BuildConfig
 import id.kotlin.movie.R
 import id.kotlin.movie.data.home.Result
-import id.kotlin.movie.databinding.ItemHomeBinding
-import id.kotlin.movie.databinding.ItemLoadingBinding
 import id.kotlin.movie.presentation.home.adapter.HomeAdapterType.LOADING
 import id.kotlin.movie.presentation.home.adapter.HomeAdapterType.RESULT
+import kotlinx.android.synthetic.main.item_home.view.*
 
 class HomeAdapter(
     private var results: MutableList<Result?>,
@@ -22,22 +23,24 @@ class HomeAdapter(
       when (viewType) {
         RESULT.ordinal -> {
           HomeViewHolder(
-              DataBindingUtil.inflate(
-                  LayoutInflater.from(parent.context),
-                  R.layout.item_home,
-                  parent,
-                  false
-              )
+              LayoutInflater
+                  .from(parent.context)
+                  .inflate(
+                      R.layout.item_home,
+                      parent,
+                      false
+                  )
           )
         }
         LOADING.ordinal -> {
           LoadingViewHolder(
-              DataBindingUtil.inflate(
-                  LayoutInflater.from(parent.context),
-                  R.layout.item_loading,
-                  parent,
-                  false
-              )
+              LayoutInflater
+                  .from(parent.context)
+                  .inflate(
+                      R.layout.item_loading,
+                      parent,
+                      false
+                  )
           )
         }
         else -> throw RuntimeException("Illegal view type")
@@ -45,11 +48,7 @@ class HomeAdapter(
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     when (holder) {
-      is HomeViewHolder -> holder.binding.apply {
-        viewModel = HomeAdapterViewModel(results[holder.adapterPosition], callback)
-        executePendingBindings()
-      }
-      is LoadingViewHolder -> holder.binding.apply { executePendingBindings() }
+      is HomeViewHolder -> holder.bind(results[holder.adapterPosition])
     }
   }
 
@@ -82,8 +81,20 @@ class HomeAdapter(
     Handler().post { notifyDataSetChanged() }
   }
 
-  inner class HomeViewHolder(val binding: ItemHomeBinding) : ViewHolder(binding.root)
-  inner class LoadingViewHolder(val binding: ItemLoadingBinding) : ViewHolder(binding.root)
+  inner class HomeViewHolder(itemView: View) : ViewHolder(itemView) {
+
+    fun bind(result: Result?) {
+      with(itemView) {
+        iv_poster.load("${BuildConfig.IMAGE_URL}/${result?.posterPath ?: "untitled.jpg"}")
+        tv_title.text = result?.title ?: "Untitled"
+        tv_rate.text = "${result?.voteAverage ?: 0.0}"
+
+        rootView.setOnClickListener { result?.let { callback.onClick(it) } }
+      }
+    }
+  }
+
+  inner class LoadingViewHolder(itemView: View) : ViewHolder(itemView)
 
   interface HomeAdapterCallback {
 
