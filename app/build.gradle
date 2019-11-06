@@ -59,4 +59,5 @@ dependencies {
   kapt 'com.google.dagger:dagger-android-processor:2.24'
   implementation 'com.google.code.findbugs:jsr305:3.0.2'
   implementation 'io.coil-kt:coil:0.8.0'
+  implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
 }
