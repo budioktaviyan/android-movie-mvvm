@@ -1,17 +1,18 @@
 package id.kotlin.movie.di.module.detail
 
+import androidx.lifecycle.ViewModel
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
-import id.kotlin.movie.data.detail.DetailModel
+import dagger.multibindings.IntoMap
+import id.kotlin.movie.di.scope.ViewModelKey
 import id.kotlin.movie.presentation.detail.DetailViewModel
 
+@Suppress("unused")
 @Module
-class DetailModule {
+abstract class DetailModule {
 
-  @Provides
-  fun providesDetailModel(): DetailModel = DetailModel()
-
-  @Provides
-  fun providesDetailViewModel(model: DetailModel): DetailViewModel =
-      DetailViewModel(model)
+  @Binds
+  @IntoMap
+  @ViewModelKey(DetailViewModel::class)
+  abstract fun bindDetailViewModel(viewModel: DetailViewModel): ViewModel
 }

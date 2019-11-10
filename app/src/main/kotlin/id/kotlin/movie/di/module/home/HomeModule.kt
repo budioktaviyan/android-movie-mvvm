@@ -7,10 +7,10 @@ import dagger.multibindings.IntoMap
 import id.kotlin.movie.di.scope.ViewModelKey
 import id.kotlin.movie.presentation.home.HomeViewModel
 
+@Suppress("unused")
 @Module
 abstract class HomeModule {
 
-  @Suppress("unused")
   @Binds
   @IntoMap
   @ViewModelKey(HomeViewModel::class)

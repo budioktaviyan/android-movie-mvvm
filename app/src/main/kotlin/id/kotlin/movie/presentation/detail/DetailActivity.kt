@@ -2,33 +2,39 @@ package id.kotlin.movie.presentation.detail
 
 import android.os.Bundle
 import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import dagger.android.support.DaggerAppCompatActivity
 import id.kotlin.movie.R
 import id.kotlin.movie.data.detail.DetailModel
-import id.kotlin.movie.databinding.ActivityDetailBinding
 import id.kotlin.movie.presentation.detail.adapter.DetailAdapter
+import kotlinx.android.synthetic.main.activity_detail.*
 import javax.inject.Inject
 
 class DetailActivity : DaggerAppCompatActivity() {
 
   @Inject
-  lateinit var viewModel: DetailViewModel
+  lateinit var viewModelFactory: ViewModelProvider.Factory
+
+  private val viewModel: DetailView by lazy {
+    ViewModelProviders
+        .of(this)
+        .get(DetailViewModel::class.java)
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_detail)
 
-    val model = intent.getParcelableExtra(DetailActivity::class.java.simpleName) as DetailModel
-    val binding = DataBindingUtil.setContentView<ActivityDetailBinding>(
-        this,
-        R.layout.activity_detail)
-        .apply { viewModel = this@DetailActivity.viewModel }
-        .also {
-          viewModel.model = model
-          viewModel.setTitle()
-        }
+    val model = intent.getParcelableExtra<DetailModel>(DetailActivity::class.java.simpleName)
+    viewModel.model.postValue(model)
+    viewModel.model.observe(this, Observer { state ->
+      toolbar_detail.title = state.title ?: "Untitled"
+      rv_detail.adapter = DetailAdapter(state)
+    })
 
-    setSupportActionBar(binding.toolbarDetail)
+    setSupportActionBar(toolbar_detail)
     supportActionBar?.apply {
       setDisplayHomeAsUpEnabled(true)
       setHomeAsUpIndicator(
@@ -38,8 +44,6 @@ class DetailActivity : DaggerAppCompatActivity() {
           )
       )
     }
-
-    binding.rvDetail.adapter = DetailAdapter(model)
   }
 
   override fun onSupportNavigateUp(): Boolean {

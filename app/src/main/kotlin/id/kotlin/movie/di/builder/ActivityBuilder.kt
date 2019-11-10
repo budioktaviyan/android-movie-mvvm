@@ -10,18 +10,16 @@ import id.kotlin.movie.di.module.home.HomeModule
 import id.kotlin.movie.presentation.detail.DetailActivity
 import id.kotlin.movie.presentation.home.HomeActivity
 
+@Suppress("unused")
 @Module
 abstract class ActivityBuilder {
 
-  @Suppress("unused")
   @Binds
   abstract fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory
 
-  @Suppress("unused")
   @ContributesAndroidInjector(modules = [HomeModule::class])
   abstract fun contributeHomeActivity(): HomeActivity
 
-  @Suppress("unused")
   @ContributesAndroidInjector(modules = [DetailModule::class])
   abstract fun contributeDetailActivity(): DetailActivity
 }

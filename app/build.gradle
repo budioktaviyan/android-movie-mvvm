@@ -26,9 +26,6 @@ android {
   sourceSets {
     main.java.srcDirs += 'src/main/kotlin'
   }
-  dataBinding {
-    enabled true
-  }
   kotlinOptions {
     jvmTarget = '1.8'
   }

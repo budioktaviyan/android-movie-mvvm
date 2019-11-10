@@ -1,16 +1,18 @@
 package id.kotlin.movie.presentation.detail.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import coil.api.load
+import id.kotlin.movie.BuildConfig
 import id.kotlin.movie.R
 import id.kotlin.movie.data.detail.DetailModel
-import id.kotlin.movie.databinding.ItemBodyBinding
-import id.kotlin.movie.databinding.ItemHeaderBinding
 import id.kotlin.movie.presentation.detail.adapter.DetailAdapterType.BODY
 import id.kotlin.movie.presentation.detail.adapter.DetailAdapterType.HEADER
+import kotlinx.android.synthetic.main.item_body.view.*
+import kotlinx.android.synthetic.main.item_header.view.*
 
 class DetailAdapter(
     private val model: DetailModel
@@ -20,22 +22,24 @@ class DetailAdapter(
       when (viewType) {
         HEADER.ordinal -> {
           DetailHeaderViewHolder(
-              DataBindingUtil.inflate(
-                  LayoutInflater.from(parent.context),
-                  R.layout.item_header,
-                  parent,
-                  false
-              )
+              LayoutInflater
+                  .from(parent.context)
+                  .inflate(
+                      R.layout.item_header,
+                      parent,
+                      false
+                  )
           )
         }
         BODY.ordinal -> {
           DetailBodyViewHolder(
-              DataBindingUtil.inflate(
-                  LayoutInflater.from(parent.context),
-                  R.layout.item_body,
-                  parent,
-                  false
-              )
+              LayoutInflater
+                  .from(parent.context)
+                  .inflate(
+                      R.layout.item_body,
+                      parent,
+                      false
+                  )
           )
         }
         else -> throw RuntimeException("Illegal view type")
@@ -43,14 +47,8 @@ class DetailAdapter(
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     when (holder) {
-      is DetailHeaderViewHolder -> holder.binding.apply {
-        viewModel = DetailHeaderViewModel(model)
-        executePendingBindings()
-      }
-      is DetailBodyViewHolder -> holder.binding.apply {
-        viewModel = DetailBodyViewModel(model)
-        executePendingBindings()
-      }
+      is DetailHeaderViewHolder -> holder.bind(model)
+      is DetailBodyViewHolder -> holder.bind(model)
     }
   }
 
@@ -62,6 +60,21 @@ class DetailAdapter(
         else -> BODY.ordinal
       }
 
-  inner class DetailHeaderViewHolder(val binding: ItemHeaderBinding) : ViewHolder(binding.root)
-  inner class DetailBodyViewHolder(val binding: ItemBodyBinding) : ViewHolder(binding.root)
+  inner class DetailHeaderViewHolder(itemView: View) : ViewHolder(itemView) {
+
+    fun bind(model: DetailModel) {
+      with(itemView) {
+        iv_backdrop.load(
+            "${BuildConfig.IMAGE_URL}/${model.backdropPath ?: "untitled.jpg"}"
+        )
+      }
+    }
+  }
+
+  inner class DetailBodyViewHolder(itemView: View) : ViewHolder(itemView) {
+
+    fun bind(model: DetailModel) {
+      with(itemView) { tv_overview.text = model.overview ?: "No Description" }
+    }
+  }
 }

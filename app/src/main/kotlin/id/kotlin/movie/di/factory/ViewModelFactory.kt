@@ -5,30 +5,11 @@ import androidx.lifecycle.ViewModelProvider
 import javax.inject.Inject
 import javax.inject.Provider
 
+@Suppress("UNCHECKED_CAST")
 class ViewModelFactory @Inject constructor(
-    private val viewModels: Map<Class<out ViewModel>,
-        @JvmSuppressWildcards Provider<ViewModel>>
+    private val viewModels: MutableMap<Class<out ViewModel>, Provider<ViewModel>>
 ) : ViewModelProvider.Factory {
 
-  @Suppress("UNCHECKED_CAST")
-  override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-    var viewModel: Provider<ViewModel>? = viewModels[modelClass]
-
-    if (viewModel == null) {
-      for ((key, value) in viewModels) {
-        if (modelClass.isAssignableFrom(key)) {
-          viewModel = value
-          break
-        }
-      }
-    }
-
-    requireNotNull(viewModel) { "unknown model class $modelClass" }
-
-    try {
-      return viewModel.get() as T
-    } catch (e: Exception) {
-      throw RuntimeException(e)
-    }
-  }
+  override fun <T : ViewModel?> create(modelClass: Class<T>): T =
+      viewModels[modelClass]?.get() as T
 }
