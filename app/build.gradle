@@ -56,4 +56,5 @@ dependencies {
   kapt 'com.google.dagger:dagger-android-processor:2.25.2'
   implementation 'io.coil-kt:coil:0.8.0'
   implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
+  implementation 'androidx.paging:paging-runtime:2.1.0'
 }
