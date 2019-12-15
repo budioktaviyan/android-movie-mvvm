@@ -1,7 +1,6 @@
 package id.kotlin.movie.presentation.detail
 
 import android.os.Bundle
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
@@ -19,31 +18,24 @@ class DetailActivity : DaggerAppCompatActivity() {
 
   private val viewModel: DetailView by lazy {
     ViewModelProviders
-        .of(this)
-        .get(DetailViewModel::class.java)
+        .of(
+            this,
+            viewModelFactory
+        )[DetailViewModel::class.java]
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_detail)
+    setSupportActionBar(toolbar_detail)
+    supportActionBar?.apply { setDisplayHomeAsUpEnabled(true) }
 
     val model = intent.getParcelableExtra<DetailModel>(DetailActivity::class.java.simpleName)
     viewModel.model.postValue(model)
     viewModel.model.observe(this, Observer { state ->
-      toolbar_detail.title = state.title ?: "Untitled"
+      toolbar_detail.title = state.title
       rv_detail.adapter = DetailAdapter(state)
     })
-
-    setSupportActionBar(toolbar_detail)
-    supportActionBar?.apply {
-      setDisplayHomeAsUpEnabled(true)
-      setHomeAsUpIndicator(
-          ContextCompat.getDrawable(
-              this@DetailActivity,
-              R.drawable.ic_arrow_back
-          )
-      )
-    }
   }
 
   override fun onSupportNavigateUp(): Boolean {

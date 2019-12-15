@@ -5,14 +5,12 @@ import dagger.android.AndroidInjector
 import dagger.android.support.AndroidSupportInjectionModule
 import id.kotlin.movie.MovieApp
 import id.kotlin.movie.di.builder.ActivityBuilder
-import id.kotlin.movie.di.module.core.ApplicationModule
 import id.kotlin.movie.di.module.core.NetworkModule
-import id.kotlin.movie.di.scope.Application
+import javax.inject.Singleton
 
-@Application
+@Singleton
 @Component(modules = [
   AndroidSupportInjectionModule::class,
-  ApplicationModule::class,
   NetworkModule::class,
   ActivityBuilder::class
 ])

@@ -15,7 +15,7 @@ import id.kotlin.movie.presentation.home.HomeActivity
 abstract class ActivityBuilder {
 
   @Binds
-  abstract fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory
+  abstract fun bindViewModelFactory(viewModelFactory: ViewModelFactory): ViewModelProvider.Factory
 
   @ContributesAndroidInjector(modules = [HomeModule::class])
   abstract fun contributeHomeActivity(): HomeActivity

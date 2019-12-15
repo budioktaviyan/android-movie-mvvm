@@ -63,18 +63,14 @@ class DetailAdapter(
   inner class DetailHeaderViewHolder(itemView: View) : ViewHolder(itemView) {
 
     fun bind(model: DetailModel) {
-      with(itemView) {
-        iv_backdrop.load(
-            "${BuildConfig.IMAGE_URL}/${model.backdropPath ?: "untitled.jpg"}"
-        )
-      }
+      with(itemView) { iv_backdrop.load("${BuildConfig.IMAGE_URL}/${model.backdropPath}") }
     }
   }
 
   inner class DetailBodyViewHolder(itemView: View) : ViewHolder(itemView) {
 
     fun bind(model: DetailModel) {
-      with(itemView) { tv_overview.text = model.overview ?: "No Description" }
+      with(itemView) { tv_overview.text = model.overview }
     }
   }
 }

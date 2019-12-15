@@ -1,52 +1,42 @@
 package id.kotlin.movie.presentation.home
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.paging.LivePagedListBuilder
+import androidx.paging.PagedList
 import id.kotlin.movie.data.home.HomeDatasource
-import io.reactivex.disposables.CompositeDisposable
+import id.kotlin.movie.data.home.HomeFactory
+import id.kotlin.movie.data.home.HomeResponse.Result
 import javax.inject.Inject
 
 class HomeViewModel @Inject constructor(
-    private val datasource: HomeDatasource
+    private val factory: HomeFactory
 ) : ViewModel(), HomeView {
 
-  private val disposables: CompositeDisposable = CompositeDisposable()
-  private val observer = MutableLiveData<HomeViewState>()
+  private val config = PagedList.Config.Builder().apply {
+    setEnablePlaceholders(false)
+    setPageSize(20)
+  }.build()
 
   override val states: LiveData<HomeViewState>
-    get() = observer
+    get() = Transformations.switchMap<HomeDatasource, HomeViewState>(
+        factory.sourceLiveData,
+        HomeDatasource::states
+    )
+
+  override val paged: LiveData<PagedList<Result>>
+    get() = LivePagedListBuilder<Long, Result>(
+        factory,
+        config
+    ).build()
 
   override fun onCleared() {
-    disposables.clear()
     super.onCleared()
+    factory.disposables.clear()
   }
 
-  override fun discoverMovie() {
-    datasource.discoverMovie()
-        .map<HomeViewState>(HomeViewState::Success)
-        .onErrorReturn(HomeViewState::Error)
-        .toFlowable()
-        .startWith(HomeViewState.Loading)
-        .subscribe(observer::postValue)
-        .let(disposables::add)
-  }
-
-  override fun loadMore(page: Long) {
-    datasource.discoverMovie(page = page)
-        .map<HomeViewState>(HomeViewState::PaginationSuccess)
-        .onErrorReturn(HomeViewState::PaginationError)
-        .toFlowable()
-        .subscribe(observer::postValue)
-        .let(disposables::add)
-  }
-
-  override fun reload() {
-    datasource.discoverMovie()
-        .map<HomeViewState>(HomeViewState::ReloadSuccess)
-        .onErrorReturn(HomeViewState::ReloadError)
-        .toFlowable()
-        .subscribe(observer::postValue)
-        .let(disposables::add)
+  override fun refresh() {
+    factory.sourceLiveData.value?.invalidate()
   }
 }

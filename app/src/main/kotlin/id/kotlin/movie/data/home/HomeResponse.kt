@@ -4,28 +4,32 @@ import com.google.gson.annotations.SerializedName
 
 data class HomeResponse(
     @SerializedName("page")
-    val page: Long = -1L,
+    val page: Long,
 
     @SerializedName("total_pages")
-    val totalPages: Long = -1L,
+    val totalPages: Long,
 
     @SerializedName("results")
     val results: List<Result?> = emptyList()
-)
+) {
 
-data class Result(
-    @SerializedName("title")
-    val title: String? = "",
+  data class Result(
+      @SerializedName("id")
+      val id: Long? = 1L,
 
-    @SerializedName("overview")
-    val overview: String? = "",
+      @SerializedName("title")
+      val title: String? = "Untitled",
 
-    @SerializedName("poster_path")
-    val posterPath: String? = "",
+      @SerializedName("overview")
+      val overview: String? = "No Description",
 
-    @SerializedName("backdrop_path")
-    val backdropPath: String? = "",
+      @SerializedName("poster_path")
+      val posterPath: String? = "untitled.jpg",
 
-    @SerializedName("vote_average")
-    val voteAverage: Double? = 0.0
-)
+      @SerializedName("backdrop_path")
+      val backdropPath: String? = "untitled.jpg",
+
+      @SerializedName("vote_average")
+      val voteAverage: Double? = 0.0
+  )
+}
