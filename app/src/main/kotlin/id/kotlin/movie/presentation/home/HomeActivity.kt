@@ -8,7 +8,6 @@ import android.view.View.VISIBLE
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import dagger.android.support.DaggerAppCompatActivity
@@ -31,11 +30,10 @@ class HomeActivity : DaggerAppCompatActivity(), HomeAdapterCallback {
   lateinit var viewModelFactory: ViewModelProvider.Factory
 
   private val viewModel: HomeView by lazy {
-    ViewModelProviders
-        .of(
-            this,
-            viewModelFactory
-        )[HomeViewModel::class.java]
+    ViewModelProvider(
+        this,
+        viewModelFactory
+    )[HomeViewModel::class.java]
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {

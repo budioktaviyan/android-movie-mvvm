@@ -3,7 +3,6 @@ package id.kotlin.movie.presentation.detail
 import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import dagger.android.support.DaggerAppCompatActivity
 import id.kotlin.movie.R
 import id.kotlin.movie.data.detail.DetailModel
@@ -17,11 +16,10 @@ class DetailActivity : DaggerAppCompatActivity() {
   lateinit var viewModelFactory: ViewModelProvider.Factory
 
   private val viewModel: DetailView by lazy {
-    ViewModelProviders
-        .of(
-            this,
-            viewModelFactory
-        )[DetailViewModel::class.java]
+    ViewModelProvider(
+        this,
+        viewModelFactory
+    )[DetailViewModel::class.java]
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
