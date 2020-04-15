@@ -1,7 +1,6 @@
 package id.kotlin.movie.presentation.home.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
@@ -10,14 +9,13 @@ import androidx.recyclerview.widget.DiffUtil.ItemCallback
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil.api.load
 import id.kotlin.movie.BuildConfig
-import id.kotlin.movie.R
 import id.kotlin.movie.data.home.HomeResponse.Result
+import id.kotlin.movie.databinding.ItemHomeBinding
+import id.kotlin.movie.databinding.ItemLoadingBinding
 import id.kotlin.movie.presentation.home.HomeViewState
 import id.kotlin.movie.presentation.home.HomeViewState.Page
 import id.kotlin.movie.presentation.home.adapter.HomeAdapterType.LOADING
 import id.kotlin.movie.presentation.home.adapter.HomeAdapterType.RESULT
-import kotlinx.android.synthetic.main.item_home.view.*
-import kotlinx.android.synthetic.main.item_loading.view.*
 
 class HomeAdapter(
     diffCallback: ItemCallback<Result> = HomeItemCallback,
@@ -30,24 +28,20 @@ class HomeAdapter(
       when (viewType) {
         RESULT.ordinal -> {
           HomeViewHolder(
-              LayoutInflater
-                  .from(parent.context)
-                  .inflate(
-                      R.layout.item_home,
-                      parent,
-                      false
-                  )
+              ItemHomeBinding.inflate(
+                  LayoutInflater.from(parent.context),
+                  parent,
+                  false
+              )
           )
         }
         LOADING.ordinal -> {
           LoadingViewHolder(
-              LayoutInflater
-                  .from(parent.context)
-                  .inflate(
-                      R.layout.item_loading,
-                      parent,
-                      false
-                  )
+              ItemLoadingBinding.inflate(
+                  LayoutInflater.from(parent.context),
+                  parent,
+                  false
+              )
           )
         }
         else -> throw RuntimeException("Illegal view type")
@@ -66,25 +60,21 @@ class HomeAdapter(
         else -> RESULT.ordinal
       }
 
-  inner class HomeViewHolder(itemView: View) : ViewHolder(itemView) {
+  inner class HomeViewHolder(private val binding: ItemHomeBinding) : ViewHolder(binding.root) {
 
     fun bind(result: Result) {
-      with(itemView) {
-        iv_poster.load("${BuildConfig.IMAGE_URL}/${result.posterPath}")
-        tv_title.text = result.title
-        tv_rate.text = "${result.voteAverage}"
+      binding.ivPoster.load("${BuildConfig.IMAGE_URL}/${result.posterPath}")
+      binding.tvTitle.text = result.title
+      binding.tvRate.text = "${result.voteAverage}"
 
-        rootView.setOnClickListener { callback.onClick(result) }
-      }
+      binding.root.setOnClickListener { callback.onClick(result) }
     }
   }
 
-  inner class LoadingViewHolder(itemView: View) : ViewHolder(itemView) {
+  inner class LoadingViewHolder(private val binding: ItemLoadingBinding) : ViewHolder(binding.root) {
 
     fun bind(state: HomeViewState) {
-      with(itemView) {
-        pb_loading.visibility = if (state is Page) VISIBLE else GONE
-      }
+      binding.pbLoading.visibility = if (state is Page) VISIBLE else GONE
     }
   }
 

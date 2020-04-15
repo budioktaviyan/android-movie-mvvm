@@ -14,6 +14,7 @@ import dagger.android.support.DaggerAppCompatActivity
 import id.kotlin.movie.R
 import id.kotlin.movie.data.detail.DetailModel
 import id.kotlin.movie.data.home.HomeResponse.Result
+import id.kotlin.movie.databinding.ActivityHomeBinding
 import id.kotlin.movie.presentation.detail.DetailActivity
 import id.kotlin.movie.presentation.home.HomeViewState.Failed
 import id.kotlin.movie.presentation.home.HomeViewState.Loading
@@ -21,7 +22,6 @@ import id.kotlin.movie.presentation.home.adapter.HomeAdapter
 import id.kotlin.movie.presentation.home.adapter.HomeAdapter.HomeAdapterCallback
 import id.kotlin.movie.presentation.home.adapter.HomeAdapterType.LOADING
 import id.kotlin.movie.presentation.home.adapter.HomeAdapterType.RESULT
-import kotlinx.android.synthetic.main.activity_home.*
 import javax.inject.Inject
 
 class HomeActivity : DaggerAppCompatActivity(), HomeAdapterCallback {
@@ -36,14 +36,18 @@ class HomeActivity : DaggerAppCompatActivity(), HomeAdapterCallback {
     )[HomeViewModel::class.java]
   }
 
+  private lateinit var binding: ActivityHomeBinding
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_home)
+
+    binding = ActivityHomeBinding.inflate(layoutInflater)
+    setContentView(binding.root)
 
     val adapter = HomeAdapter(callback = this)
-    rv_home.adapter = adapter
-    rv_home.setHasFixedSize(true)
-    (rv_home.layoutManager as GridLayoutManager).apply {
+    binding.rvHome.adapter = adapter
+    binding.rvHome.setHasFixedSize(true)
+    (binding.rvHome.layoutManager as GridLayoutManager).apply {
       spanSizeLookup = object : SpanSizeLookup() {
         override fun getSpanSize(position: Int): Int =
             when (adapter.getItemViewType(position)) {
@@ -54,19 +58,19 @@ class HomeActivity : DaggerAppCompatActivity(), HomeAdapterCallback {
       }
     }
 
-    srl_home.setColorSchemeColors(
+    binding.srlHome.setColorSchemeColors(
         ContextCompat.getColor(
             this,
             R.color.black
         )
     )
-    srl_home.setOnRefreshListener { viewModel.refresh() }
+    binding.srlHome.setOnRefreshListener { viewModel.refresh() }
 
     viewModel.states.observe(this, Observer { state ->
       adapter.state = state
       if (state is Failed) Log.e(HomeActivity::class.java.simpleName, "${state.error}")
-      pb_home.visibility = if (state is Loading) VISIBLE else GONE
-      srl_home.isRefreshing = false
+      binding.pbHome.visibility = if (state is Loading) VISIBLE else GONE
+      binding.srlHome.isRefreshing = false
     })
 
     viewModel.paged.observe(this, Observer { page ->

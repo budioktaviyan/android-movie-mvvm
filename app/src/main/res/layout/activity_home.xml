@@ -30,7 +30,8 @@
       android:elevation="4dp"
       app:layout_constraintTop_toTopOf="parent"
       app:title="@string/app_name"
-      app:titleTextColor="@color/black" />
+      app:titleTextColor="@color/black"
+      tools:viewBindingIgnore="true" />
 
   <ProgressBar
       android:id="@+id/pb_home"

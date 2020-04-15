@@ -1,18 +1,16 @@
 package id.kotlin.movie.presentation.detail.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil.api.load
 import id.kotlin.movie.BuildConfig
-import id.kotlin.movie.R
 import id.kotlin.movie.data.detail.DetailModel
+import id.kotlin.movie.databinding.ItemBodyBinding
+import id.kotlin.movie.databinding.ItemHeaderBinding
 import id.kotlin.movie.presentation.detail.adapter.DetailAdapterType.BODY
 import id.kotlin.movie.presentation.detail.adapter.DetailAdapterType.HEADER
-import kotlinx.android.synthetic.main.item_body.view.*
-import kotlinx.android.synthetic.main.item_header.view.*
 
 class DetailAdapter(
     private val model: DetailModel
@@ -22,24 +20,20 @@ class DetailAdapter(
       when (viewType) {
         HEADER.ordinal -> {
           DetailHeaderViewHolder(
-              LayoutInflater
-                  .from(parent.context)
-                  .inflate(
-                      R.layout.item_header,
-                      parent,
-                      false
-                  )
+              ItemHeaderBinding.inflate(
+                  LayoutInflater.from(parent.context),
+                  parent,
+                  false
+              )
           )
         }
         BODY.ordinal -> {
           DetailBodyViewHolder(
-              LayoutInflater
-                  .from(parent.context)
-                  .inflate(
-                      R.layout.item_body,
-                      parent,
-                      false
-                  )
+              ItemBodyBinding.inflate(
+                  LayoutInflater.from(parent.context),
+                  parent,
+                  false
+              )
           )
         }
         else -> throw RuntimeException("Illegal view type")
@@ -60,17 +54,17 @@ class DetailAdapter(
         else -> BODY.ordinal
       }
 
-  inner class DetailHeaderViewHolder(itemView: View) : ViewHolder(itemView) {
+  inner class DetailHeaderViewHolder(private val binding: ItemHeaderBinding) : ViewHolder(binding.root) {
 
     fun bind(model: DetailModel) {
-      with(itemView) { iv_backdrop.load("${BuildConfig.IMAGE_URL}/${model.backdropPath}") }
+      binding.ivBackdrop.load("${BuildConfig.IMAGE_URL}/${model.backdropPath}")
     }
   }
 
-  inner class DetailBodyViewHolder(itemView: View) : ViewHolder(itemView) {
+  inner class DetailBodyViewHolder(private val binding: ItemBodyBinding) : ViewHolder(binding.root) {
 
     fun bind(model: DetailModel) {
-      with(itemView) { tv_overview.text = model.overview }
+      binding.tvOverview.text = model.overview
     }
   }
 }
